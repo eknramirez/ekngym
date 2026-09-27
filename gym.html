@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EKN GYM — Plan de entrenamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111417;
+    --surface:#1A1F24;
+    --surface-2:#20262C;
+    --line:#2A3138;
+    --text:#ECEEF0;
+    --muted:#8B95A1;
+    --accent:#FF4E2E;
+    --accent-dim:#5A2318;
+    --rest:#3DDC84;
+    --rest-dim:#183826;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#111417; --surface:#1A1F24; --surface-2:#20262C; --line:#2A3138;
+      --text:#ECEEF0; --muted:#8B95A1;
+    }
+  }
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100%;
+  }
+  .wrap{ max-width:760px; margin:0 auto; padding:28px 20px 60px; }
+
+  header{ margin-bottom:20px; }
+
+  .profile-select{
+    display:flex; gap:8px; margin-bottom:20px;
+  }
+  .profile-btn{
+    flex:1; padding:14px 12px; border-radius:14px; border:1px solid var(--line);
+    background:var(--surface); color:var(--muted); cursor:pointer;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.05rem;
+    text-align:left; transition:border-color .15s, color .15s;
+  }
+  .profile-btn small{ display:block; font-family:'Inter',sans-serif; font-weight:500; font-size:0.72rem; color:var(--muted); margin-top:2px; }
+  .profile-btn.active{ border-color:var(--accent); color:var(--text); }
+  .profile-btn.active small{ color:var(--accent); }
+  .brand{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    font-size:clamp(2.4rem, 9vw, 3.4rem);
+    line-height:0.95;
+    letter-spacing:0.5px;
+    margin:0;
+  }
+  .brand span{ color:var(--accent); }
+  .subline{ color:var(--muted); font-size:0.98rem; margin-top:8px; max-width:46ch; }
+
+  .phase-select{
+    display:flex; gap:6px; margin:24px 0 20px; overflow-x:auto;
+    scrollbar-width:none; padding-bottom:2px;
+  }
+  .phase-select::-webkit-scrollbar{ display:none; }
+  .phase-btn{
+    flex:0 0 auto; min-width:92px; padding:10px 12px; border:1px solid var(--line);
+    background:var(--surface); color:var(--muted);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.8rem;
+    border-radius:12px; cursor:pointer; transition:background .15s, color .15s;
+    text-align:center; line-height:1.25;
+  }
+  .phase-btn small{ display:block; font-weight:500; opacity:.75; font-size:0.72rem; margin-top:2px; }
+  .phase-btn.active{ background:var(--accent); color:#fff; }
+
+  .day-tabs{
+    display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:20px;
+    scrollbar-width:none;
+  }
+  .day-tabs::-webkit-scrollbar{ display:none; }
+  .day-btn{
+    flex:0 0 auto; padding:10px 16px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text); font-family:'Inter',sans-serif;
+    font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap;
+  }
+  .day-btn.active{ background:var(--text); color:var(--bg); border-color:var(--text); }
+  .day-btn.rest{ color:var(--rest); }
+  .day-btn.rest.active{ background:var(--rest); color:#0A1F13; border-color:var(--rest); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:22px 20px; margin-bottom:16px;
+  }
+  .card-title{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.5rem;
+    margin:0 0 4px;
+  }
+  .card-tag{ color:var(--muted); font-size:0.85rem; margin-bottom:16px; }
+
+  .hero{
+    background:linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+    border:1px solid var(--line); border-radius:18px;
+    padding:26px 22px; margin-bottom:22px;
+  }
+  .hero-kicker{ color:var(--accent); font-weight:700; font-size:0.8rem; margin:0 0 8px; }
+  .hero-line{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:clamp(1.4rem, 5vw, 1.9rem);
+    line-height:1.15; margin:0;
+  }
+
+  .progress-row{ display:flex; align-items:center; gap:10px; margin:2px 0 18px; }
+  .progress-track{ flex:1; height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--accent); border-radius:999px; transition:width .25s ease; width:0%; }
+  .progress-label{ font-size:0.78rem; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
+
+  .done-banner{
+    display:none; align-items:center; gap:10px; background:var(--rest-dim);
+    border:1px solid var(--rest); color:var(--rest); border-radius:12px;
+    padding:12px 14px; font-weight:600; font-size:0.9rem; margin-top:14px;
+  }
+  .done-banner.show{ display:flex; }
+
+  .ex-row{ cursor:pointer; }
+  .ex-row.done .ex-name{ color:var(--rest); text-decoration:line-through; text-decoration-color:var(--rest); opacity:0.75; }
+  .ex-row.done .ex-equip{ opacity:0.6; }
+  .check{
+    width:22px; height:22px; border-radius:7px; border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    background:var(--surface-2); transition:background .15s, border-color .15s;
+  }
+  .check.done{ background:var(--rest); border-color:var(--rest); }
+  .check svg{ display:none; width:14px; height:14px; }
+  .check.done svg{ display:block; }
+  .ex-cell{ display:flex; align-items:center; gap:12px; }
+  .rest-card .card-title{ color:var(--rest); }
+
+  table{ width:100%; border-collapse:collapse; }
+  th{
+    text-align:left; font-size:0.72rem; color:var(--muted); font-weight:600;
+    padding:0 8px 8px 0; border-bottom:1px solid var(--line);
+  }
+  td{
+    padding:12px 8px 12px 0; border-bottom:1px solid var(--line); font-size:0.92rem;
+  }
+  tr:last-child td{ border-bottom:none; }
+  .ex-name{ font-weight:600; }
+  .ex-equip{ color:var(--muted); font-size:0.78rem; margin-top:2px; }
+  .num{ font-variant-numeric:tabular-nums; color:var(--text); }
+
+  .note{
+    background:var(--surface-2); border-left:3px solid var(--accent);
+    padding:12px 14px; border-radius:0 10px 10px 0; font-size:0.85rem; color:var(--muted);
+    margin-top:4px;
+  }
+  .note b{ color:var(--text); }
+
+  .footer-note{ color:var(--muted); font-size:0.8rem; margin-top:28px; line-height:1.6; }
+  .footer-note b{ color:var(--text); }
+
+  /* ---------- LANDING ---------- */
+  .landing{
+    position:fixed; inset:0; z-index:80; background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; padding:24px;
+  }
+  .landing::before{
+    content:''; position:absolute; top:50%; left:50%;
+    width:140vmax; height:140vmax; transform:translate(-50%,-55%);
+    background:radial-gradient(circle, rgba(255,78,46,0.22) 0%, rgba(255,78,46,0.06) 32%, transparent 60%);
+    pointer-events:none;
+  }
+  .landing-stripe{
+    position:absolute; left:-10%; top:38%; width:0%; height:64px;
+    background:var(--accent); transform:skewY(-4deg); z-index:0;
+    animation: stripe-grow 0.9s cubic-bezier(.16,.9,.28,1) 0.15s forwards;
+  }
+  @keyframes stripe-grow{ to{ width:120%; } }
+  .landing-inner{
+    position:relative; z-index:1; max-width:560px; text-align:center;
+    opacity:0; transform:translateY(18px);
+    animation: rise-in 0.7s ease 0.35s forwards;
+  }
+  @keyframes rise-in{ to{ opacity:1; transform:translateY(0); } }
+  .landing-kicker{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:2px;
+    color:var(--accent); font-size:0.95rem; margin:0 0 14px;
+  }
+  .landing-title{
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:clamp(2.6rem, 11vw, 4.6rem); line-height:0.98; margin:0 0 18px;
+    color:var(--text);
+  }
+  .landing-title em{ font-style:normal; color:var(--accent); }
+  .landing-sub{
+    color:var(--muted); font-size:1.02rem; line-height:1.55; margin:0 auto 30px;
+    max-width:42ch;
+  }
+  .landing-cta{
+    display:inline-block; background:var(--accent); color:#fff; border:none;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.25rem;
+    letter-spacing:0.5px; padding:16px 40px; border-radius:999px; cursor:pointer;
+    box-shadow:0 10px 30px rgba(255,78,46,0.35);
+  }
+  .landing-stats{
+    display:flex; gap:22px; justify-content:center; margin-top:34px;
+    color:var(--muted); font-size:0.82rem;
+  }
+  .landing-stats b{ color:var(--text); display:block; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.3rem; }
+  @media (prefers-reduced-motion: reduce){
+    .landing-stripe, .landing-inner{ animation:none; opacity:1; transform:none; width:120%; }
+  }
+</style>
+</head>
+<body>
+<div class="landing" id="landing">
+  <div class="landing-stripe"></div>
+  <div class="landing-inner">
+    <p class="landing-kicker">EKN GYM · EN CASA, SIN EXCUSAS</p>
+    <h1 class="landing-title">TU CUERPO<br>ESTÁ ESPERANDO<br><em>QUE EMPIECES.</em></h1>
+    <p class="landing-sub">6 meses, 2 rutinas, un solo lugar: tu casa. Cada check en la lista es un paso que ya no vas a devolver.</p>
+    <button class="landing-cta" onclick="enterApp()">Entrar y entrenar</button>
+    <div class="landing-stats">
+      <div><b>24</b>semanas</div>
+      <div><b>2</b>rutinas</div>
+      <div><b>0</b>excusas</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <p class="brand">EKN<span>GYM</span></p>
+  </header>
+
+  <div class="hero">
+    <p class="hero-kicker">Hoy también cuenta</p>
+    <p class="hero-line" id="heroLine">Nadie va a hacerlo por ti. Cada repetición de hoy es un paso menos hacia el peso que quieres y uno más lejos del que dejas atrás.</p>
+  </div>
+
+  <div class="profile-select" id="profileSelect"></div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <p class="card-title" style="font-size:1.15rem;">Lineamientos para los 6 meses</p>
+    <p class="note" style="margin-top:10px;">
+      <b>Progresión:</b> cada bloque de 6 semanas sube dificultad (más repeticiones, más variedad, menos descanso). No te saltes bloques aunque te sientas listo antes de tiempo — las articulaciones necesitan el mismo tiempo que el músculo para adaptarse.
+    </p>
+    <p class="note" style="margin-top:10px;">
+      <b>Cardio extra:</b> a partir del mes 2, si el tiempo lo permite, suma 2 caminatas de 20–30 min fuera de casa por semana — acelera la pérdida de grasa sin sumar más carga articular.
+    </p>
+    <p class="note" style="margin-top:10px;">
+      <b>Dolor articular ≠ fatiga muscular:</b> el ardor muscular es normal; el dolor en rodilla, muñeca o espalda baja no — si aparece, reduce el rango o el peso de esa serie.
+    </p>
+    <p class="note" style="margin-top:10px;">
+      <b>Reevalúa cada 4–6 semanas:</b> repite la medición de composición corporal para ajustar el plan con datos reales, no solo con la báscula.
+    </p>
+  </div>
+
+  <div class="phase-select" id="phaseSelect"></div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div id="content"></div>
+
+  <p class="footer-note" id="footerNote"></p>
+
+</div>
+
+<script>
+const PROFILES = [
+  { id:'elkin', label:'Hombres', sub:'Mi rutina · IMC 33.5' },
+  { id:'ella', label:'Mujeres', sub:'Su rutina · IMC 32.8' },
+];
+
+const PHASES = [
+  { id:'p1', label:'Sem 1–2', sub:'Base' },
+  { id:'p2', label:'Sem 3–4', sub:'Intensidad' },
+  { id:'p3', label:'Sem 5–6', sub:'Progresión' },
+  { id:'p4', label:'Sem 7–12', sub:'Variedad' },
+  { id:'p5', label:'Sem 13–18', sub:'Fuerza avanzada' },
+  { id:'p6', label:'Sem 19–24', sub:'Metabólico' },
+];
+
+const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const REST_DAYS = { p1:[2,6], p2:[2,6], p3:[2,6], p4:[2,6], p5:[2,6], p6:[2,6] }; // 0-indexed: Mié=2, Dom=6
+
+const FOOTERS = {
+  elkin: 'Antes de entrenar: 5 min de calentamiento (movilidad articular + jumping jacks suaves). Si sientes dolor articular (no muscular) en rodillas o muñecas, detén esa serie.',
+  ella: 'Antes de entrenar: 5 min de calentamiento suave. Prioriza técnica sobre velocidad — con más carga corporal, las rodillas y muñecas necesitan más cuidado al inicio. Si el jumping jack molesta, cámbialo por "step touch" (marcha lateral sin salto) al mismo conteo.'
+};
+
+// exercise data per phase, keyed by day index (non-rest days only)
+const PLANS_ELKIN = {
+  p1: {
+    label: 'Base — volumen fijo, técnica',
+    rest: '45–60s entre series (30–45s en jumping jacks)',
+    days: {
+      0: { title:'Base completa', tag:'Lunes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+      ]},
+      1: { title:'Base + balón', tag:'Martes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 10','Balón 4kg'],
+      ]},
+      3: { title:'Base completa', tag:'Jueves', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+      ]},
+      4: { title:'Base + bandas de pie', tag:'Viernes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Caminata lateral con banda','3 x 10 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+      5: { title:'Día completo', tag:'Sábado', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+    }
+  },
+  p2: {
+    label: 'Intensidad — mismo volumen, menos descanso',
+    rest: '30–40s entre series (20–30s en jumping jacks)',
+    days: {
+      0: { title:'Base completa', tag:'Lunes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+      ]},
+      1: { title:'Base + balón', tag:'Martes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 10','Balón 4kg'],
+      ]},
+      3: { title:'Base completa', tag:'Jueves', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+      ]},
+      4: { title:'Base + bandas de pie', tag:'Viernes', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Caminata lateral con banda','3 x 10 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+      5: { title:'Día completo', tag:'Sábado', items:[
+        ['Sentadillas','4 x 25','—'],
+        ['Flexiones de pecho','4 x 15','Soportes'],
+        ['Jumping jacks','4 x 75 (= 300)','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+    }
+  },
+  p3: {
+    label: 'Progresión — más dificultad',
+    rest: '30–40s entre series (20–30s en jumping jacks)',
+    days: {
+      0: { title:'Base con progresión', tag:'Lunes', items:[
+        ['Sentadillas (1 serie con salto)','4 x 25','—'],
+        ['Flexiones de pecho','4 x 18–20','Soportes'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+      ]},
+      1: { title:'Base + balón (progresión)', tag:'Martes', items:[
+        ['Sentadillas (1 serie con salto)','4 x 25','—'],
+        ['Flexiones de pecho','4 x 18–20','Soportes'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+        ['Sentadilla con balón al pecho','3 x 15','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 15','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 12','Balón 4kg'],
+      ]},
+      3: { title:'Base con progresión', tag:'Jueves', items:[
+        ['Sentadillas (1 serie con salto)','4 x 25','—'],
+        ['Flexión con toque de hombro','4 x 18–20','Soportes'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+      ]},
+      4: { title:'Base + bandas (progresión)', tag:'Viernes', items:[
+        ['Sentadillas (1 serie con salto)','4 x 25','—'],
+        ['Flexiones de pecho','4 x 18–20','Soportes'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Caminata lateral con banda','3 x 12 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 18','Banda pies'],
+      ]},
+      5: { title:'Día completo (más exigente)', tag:'Sábado', items:[
+        ['Sentadillas (1 serie con salto)','4 x 25','—'],
+        ['Flexión con toque de hombro','4 x 18–20','Soportes'],
+        ['Jumping jacks','4 x 90 (= 360) + 1 serie extra','—'],
+        ['Sentadilla con balón al pecho','3 x 15','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 15','Balón 4kg'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Puente de glúteo con banda','3 x 18','Banda pies'],
+      ]},
+    }
+  },
+  p4: {
+    label: 'Variedad — más ejercicios, más reto (mes 2–3)',
+    rest: '30–45s entre series; en el circuito del sábado, descanso mínimo entre ejercicios',
+    days: {
+      0: { title:'Base + core', tag:'Lunes', items:[
+        ['Sentadillas','4 x 30','—'],
+        ['Flexiones de pecho (piso)','4 x 20','—'],
+        ['Plancha','3 x 30–40s','—'],
+        ['Jumping jacks','4 x 80 (= 320)','—'],
+      ]},
+      1: { title:'Piernas unilaterales + balón', tag:'Martes', items:[
+        ['Zancadas alternas','3 x 12/pierna','—'],
+        ['Sentadilla búlgara con balón','3 x 10/pierna','Balón 4kg + silla'],
+        ['Peso muerto rumano a una pierna','3 x 10/pierna','Balón 4kg'],
+        ['Mountain climbers','3 x 20/lado','—'],
+      ]},
+      3: { title:'Base + cardio', tag:'Jueves', items:[
+        ['Sentadillas','4 x 30','—'],
+        ['Flexiones de pecho','4 x 20','—'],
+        ['Burpees sin salto (paso atrás)','3 x 10','—'],
+        ['Jumping jacks','4 x 80 (= 320)','—'],
+      ]},
+      4: { title:'Espalda / glúteo + bandas', tag:'Viernes', items:[
+        ['Puente de glúteo a una pierna','3 x 12/pierna','Banda pies'],
+        ['Superman','3 x 15','—'],
+        ['Remo con balón inclinado','3 x 12','Balón 4kg'],
+        ['Caminata lateral con banda','3 x 12 pasos/lado','Banda pies'],
+      ]},
+      5: { title:'Full body integrador', tag:'Sábado', items:[
+        ['Circuito: sentadillas','4 x 30','—'],
+        ['Circuito: flexiones','4 x 20','—'],
+        ['Circuito: zancadas alternas','3 x 12/pierna','—'],
+        ['Circuito: plancha','3 x 40s','—'],
+        ['Circuito: jumping jacks','4 x 80','—'],
+      ]},
+    }
+  },
+  p5: {
+    label: 'Fuerza-resistencia avanzada (mes 4–5)',
+    rest: '30–40s; sábado en formato circuito con descanso mínimo',
+    days: {
+      0: { title:'Base con salto + core', tag:'Lunes', items:[
+        ['Sentadilla con salto','4 x 20','—'],
+        ['Flexión declinada (pies en silla)','4 x 15','Soportes + silla'],
+        ['Plancha con toques de hombro','3 x 40s','—'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+      ]},
+      1: { title:'Unilateral avanzado + balón', tag:'Martes', items:[
+        ['Sentadilla búlgara con balón','4 x 12/pierna','Balón 4kg + silla'],
+        ['Step-up en silla con balón','3 x 12/pierna','Balón 4kg + silla'],
+        ['Peso muerto rumano a una pierna','3 x 12/pierna','Balón 4kg'],
+        ['Mountain climbers','4 x 20/lado','—'],
+      ]},
+      3: { title:'Base con salto + cardio', tag:'Jueves', items:[
+        ['Sentadilla con salto','4 x 20','—'],
+        ['Flexión declinada','4 x 15','Soportes + silla'],
+        ['Burpees','3 x 12','—'],
+        ['Jumping jacks','4 x 90 (= 360)','—'],
+      ]},
+      4: { title:'Glúteo / espalda avanzado', tag:'Viernes', items:[
+        ['Puente de glúteo a una pierna','4 x 15/pierna','Banda pies'],
+        ['Superman con extensión','3 x 18','—'],
+        ['Remo con balón inclinado','3 x 15','Balón 4kg'],
+        ['Caminata lateral con banda','3 x 15 pasos/lado','Banda pies'],
+      ]},
+      5: { title:'Circuito full body denso', tag:'Sábado', items:[
+        ['Circuito: sentadilla con salto','4 x 20','—'],
+        ['Circuito: flexión declinada','4 x 15','Soportes + silla'],
+        ['Circuito: sentadilla búlgara con balón','3 x 12/pierna','Balón 4kg'],
+        ['Circuito: plancha','3 x 45s','—'],
+        ['Circuito: jumping jacks','4 x 90','—'],
+      ]},
+    }
+  },
+  p6: {
+    label: 'Metabólico / consolidación (mes 6)',
+    rest: 'Formato tabata: 20s trabajo / 10s descanso, 3–4 rondas por circuito',
+    days: {
+      0: { title:'Circuito tabata', tag:'Lunes', items:[
+        ['Sentadilla con salto','Tabata: 8 x 20/10s','—'],
+        ['Flexión de pecho','Tabata: 8 x 20/10s','Soportes'],
+        ['Mountain climbers','Tabata: 8 x 20/10s','—'],
+        ['Jumping jacks','Tabata: 8 x 20/10s','—'],
+      ]},
+      1: { title:'Piernas + balón', tag:'Martes', items:[
+        ['Sentadilla búlgara con balón','4 x 15/pierna','Balón 4kg + silla'],
+        ['Peso muerto rumano a una pierna','4 x 15/pierna','Balón 4kg'],
+        ['Step-up en silla con balón','4 x 15/pierna','Balón 4kg + silla'],
+      ]},
+      3: { title:'Circuito tabata + core', tag:'Jueves', items:[
+        ['Sentadilla con salto','Tabata: 8 x 20/10s','—'],
+        ['Flexión de pecho','Tabata: 8 x 20/10s','Soportes'],
+        ['Mountain climbers','Tabata: 8 x 20/10s','—'],
+        ['Plancha','3 x 50s','—'],
+      ]},
+      4: { title:'Glúteo / espalda avanzado', tag:'Viernes', items:[
+        ['Puente de glúteo a una pierna','4 x 18/pierna','Banda pies'],
+        ['Caminata lateral con banda','4 x 15 pasos/lado','Banda pies'],
+        ['Superman','4 x 20','—'],
+      ]},
+      5: { title:'Full body + cardio extra', tag:'Sábado', items:[
+        ['Circuito completo (todo lo anterior)','1 ronda a máxima calidad','—'],
+        ['Caminata o trote suave','20–30 min','Opcional, exterior'],
+      ]},
+    }
+  }
+};
+
+const PLANS_ELLA = {
+  p1: {
+    label: 'Base — bajo impacto, técnica',
+    rest: '45–60s entre series (30–45s en jumping jacks / step touch)',
+    days: {
+      0: { title:'Base completa', tag:'Lunes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+      ]},
+      1: { title:'Base + balón', tag:'Martes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con balón al pecho','3 x 10','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 10','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 8','Balón 4kg'],
+      ]},
+      3: { title:'Base completa', tag:'Jueves', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+      ]},
+      4: { title:'Base + bandas de pie', tag:'Viernes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con banda en tobillos','3 x 12','Banda pies'],
+        ['Caminata lateral con banda','3 x 8 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 12','Banda pies'],
+      ]},
+      5: { title:'Día completo', tag:'Sábado', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con balón al pecho','3 x 10','Balón 4kg'],
+        ['Puente de glúteo con banda','3 x 12','Banda pies'],
+      ]},
+    }
+  },
+  p2: {
+    label: 'Intensidad — mismo volumen, menos descanso',
+    rest: '30–40s entre series (20–30s en jumping jacks / step touch)',
+    days: {
+      0: { title:'Base completa', tag:'Lunes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+      ]},
+      1: { title:'Base + balón', tag:'Martes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con balón al pecho','3 x 10','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 10','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 8','Balón 4kg'],
+      ]},
+      3: { title:'Base completa', tag:'Jueves', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+      ]},
+      4: { title:'Base + bandas de pie', tag:'Viernes', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con banda en tobillos','3 x 12','Banda pies'],
+        ['Caminata lateral con banda','3 x 8 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 12','Banda pies'],
+      ]},
+      5: { title:'Día completo', tag:'Sábado', items:[
+        ['Sentadillas','4 x 15','—'],
+        ['Flexiones (rodillas o pared)','4 x 10','Soportes'],
+        ['Jumping jacks / step touch','4 x 40 (= 160)','—'],
+        ['Sentadilla con balón al pecho','3 x 10','Balón 4kg'],
+        ['Puente de glúteo con banda','3 x 12','Banda pies'],
+      ]},
+    }
+  },
+  p3: {
+    label: 'Progresión — más dificultad',
+    rest: '30–40s entre series (20–30s en jumping jacks / step touch)',
+    days: {
+      0: { title:'Base con progresión', tag:'Lunes', items:[
+        ['Sentadillas','4 x 18','—'],
+        ['Flexiones (rodillas, más profundo)','4 x 12–14','Soportes'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+      ]},
+      1: { title:'Base + balón (progresión)', tag:'Martes', items:[
+        ['Sentadillas','4 x 18','—'],
+        ['Flexiones (rodillas, más profundo)','4 x 12–14','Soportes'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+        ['Press de balón sobre la cabeza','3 x 10','Balón 4kg'],
+      ]},
+      3: { title:'Base con progresión', tag:'Jueves', items:[
+        ['Sentadillas','4 x 18','—'],
+        ['Flexiones (rodillas, más profundo)','4 x 12–14','Soportes'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+      ]},
+      4: { title:'Base + bandas (progresión)', tag:'Viernes', items:[
+        ['Sentadillas','4 x 18','—'],
+        ['Flexiones (rodillas, más profundo)','4 x 12–14','Soportes'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+        ['Sentadilla con banda en tobillos','3 x 15','Banda pies'],
+        ['Caminata lateral con banda','3 x 10 pasos/lado','Banda pies'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+      5: { title:'Día completo (más exigente)', tag:'Sábado', items:[
+        ['Sentadillas','4 x 18','—'],
+        ['Flexiones (rodillas, más profundo)','4 x 12–14','Soportes'],
+        ['Jumping jacks / step touch','4 x 50 (= 200) + 1 serie extra','—'],
+        ['Sentadilla con balón al pecho','3 x 12','Balón 4kg'],
+        ['Puente de glúteo con banda','3 x 15','Banda pies'],
+      ]},
+    }
+  },
+  p4: {
+    label: 'Variedad — progresión gradual (mes 2–3)',
+    rest: '30–45s entre series; sábado en formato circuito suave',
+    days: {
+      0: { title:'Base + core', tag:'Lunes', items:[
+        ['Sentadillas','4 x 20','—'],
+        ['Flexiones (rodillas o pared)','4 x 14','Soportes'],
+        ['Plancha','3 x 20–25s','—'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+      ]},
+      1: { title:'Piernas + balón (con apoyo)', tag:'Martes', items:[
+        ['Zancadas alternas (apoyo en silla)','3 x 10/pierna','Silla'],
+        ['Sentadilla búlgara con balón (apoyo silla)','3 x 8/pierna','Balón 4kg + silla'],
+        ['Peso muerto rumano con balón','3 x 10','Balón 4kg'],
+      ]},
+      3: { title:'Base + cardio bajo impacto', tag:'Jueves', items:[
+        ['Sentadillas','4 x 20','—'],
+        ['Flexiones (rodillas o pared)','4 x 14','Soportes'],
+        ['Marcha en el sitio, rodillas altas','3 x 30s','—'],
+        ['Jumping jacks / step touch','4 x 50 (= 200)','—'],
+      ]},
+      4: { title:'Glúteo / espalda + bandas', tag:'Viernes', items:[
+        ['Puente de glúteo','3 x 15','Banda pies'],
+        ['Superman','3 x 12','—'],
+        ['Caminata lateral con banda','3 x 10 pasos/lado','Banda pies'],
+      ]},
+      5: { title:'Circuito completo suave', tag:'Sábado', items:[
+        ['Circuito: sentadillas','4 x 20','—'],
+        ['Circuito: flexiones','4 x 14','Soportes'],
+        ['Circuito: puente de glúteo','3 x 15','Banda pies'],
+        ['Circuito: jumping jacks / step touch','4 x 50','—'],
+      ]},
+    }
+  },
+  p5: {
+    label: 'Fuerza-resistencia avanzada (mes 4–5)',
+    rest: '30–40s entre series',
+    days: {
+      0: { title:'Base con más profundidad', tag:'Lunes', items:[
+        ['Sentadillas','4 x 22','—'],
+        ['Flexión más profunda (rodillas o completa)','4 x 16','Soportes'],
+        ['Plancha','3 x 30–35s','—'],
+        ['Jumping jacks / step touch','4 x 60 (= 240)','—'],
+      ]},
+      1: { title:'Piernas + balón', tag:'Martes', items:[
+        ['Sentadilla búlgara con balón','4 x 10/pierna','Balón 4kg + silla'],
+        ['Step-up en silla','3 x 10/pierna','Silla'],
+        ['Peso muerto rumano con balón','3 x 12','Balón 4kg'],
+      ]},
+      3: { title:'Base + cardio', tag:'Jueves', items:[
+        ['Sentadillas','4 x 22','—'],
+        ['Flexión más profunda','4 x 16','Soportes'],
+        ['Burpee sin salto (paso atrás)','3 x 8','—'],
+        ['Jumping jacks / step touch','4 x 60 (= 240)','—'],
+      ]},
+      4: { title:'Glúteo / espalda avanzado', tag:'Viernes', items:[
+        ['Puente de glúteo a una pierna','3 x 12/pierna','Banda pies'],
+        ['Superman','3 x 15','—'],
+        ['Caminata lateral con banda','3 x 12 pasos/lado','Banda pies'],
+      ]},
+      5: { title:'Circuito completo', tag:'Sábado', items:[
+        ['Circuito: sentadillas','4 x 22','—'],
+        ['Circuito: flexión','4 x 16','Soportes'],
+        ['Circuito: sentadilla búlgara con balón','3 x 10/pierna','Balón 4kg'],
+        ['Circuito: jumping jacks / step touch','4 x 60','—'],
+      ]},
+    }
+  },
+  p6: {
+    label: 'Metabólico / consolidación (mes 6)',
+    rest: 'Formato tabata suave: 20s trabajo / 10s descanso, 3 rondas',
+    days: {
+      0: { title:'Circuito tabata suave', tag:'Lunes', items:[
+        ['Sentadilla','Tabata: 6 x 20/10s','—'],
+        ['Flexión (rodillas o pared)','Tabata: 6 x 20/10s','Soportes'],
+        ['Step touch / jumping jack','Tabata: 6 x 20/10s','—'],
+        ['Plancha','3 x 30–40s','—'],
+      ]},
+      1: { title:'Piernas + balón', tag:'Martes', items:[
+        ['Sentadilla búlgara con balón','4 x 12/pierna','Balón 4kg + silla'],
+        ['Peso muerto rumano con balón','4 x 12','Balón 4kg'],
+        ['Step-up en silla','4 x 12/pierna','Silla'],
+      ]},
+      3: { title:'Circuito tabata + core', tag:'Jueves', items:[
+        ['Sentadilla','Tabata: 6 x 20/10s','—'],
+        ['Flexión','Tabata: 6 x 20/10s','Soportes'],
+        ['Step touch / jumping jack','Tabata: 6 x 20/10s','—'],
+        ['Plancha','3 x 40s','—'],
+      ]},
+      4: { title:'Glúteo / espalda avanzado', tag:'Viernes', items:[
+        ['Puente de glúteo a una pierna','4 x 15/pierna','Banda pies'],
+        ['Caminata lateral con banda','4 x 12 pasos/lado','Banda pies'],
+        ['Superman','4 x 18','—'],
+      ]},
+      5: { title:'Full body + cardio extra', tag:'Sábado', items:[
+        ['Circuito completo (todo lo anterior)','1 ronda a máxima calidad','—'],
+        ['Caminata suave','20–25 min','Opcional, exterior'],
+      ]},
+    }
+  }
+};
+
+const PLANS_BY_PROFILE = { elkin: PLANS_ELKIN, ella: PLANS_ELLA };
+
+let state = { profile:'elkin', phase:'p1', day:0 };
+
+function isRest(phaseId, dayIdx){ return REST_DAYS[phaseId].includes(dayIdx); }
+
+function renderProfileSelect(){
+  const el = document.getElementById('profileSelect');
+  el.innerHTML = '';
+  PROFILES.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'profile-btn' + (state.profile===p.id ? ' active':'');
+    b.innerHTML = p.label + '<small>'+p.sub+'</small>';
+    b.onclick = ()=>{ state.profile = p.id; render(); };
+    el.appendChild(b);
+  });
+}
+
+function renderPhaseSelect(){
+  const el = document.getElementById('phaseSelect');
+  el.innerHTML = '';
+  PHASES.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'phase-btn' + (state.phase===p.id ? ' active':'');
+    b.innerHTML = p.label + '<small>'+p.sub+'</small>';
+    b.onclick = ()=>{ state.phase = p.id; render(); };
+    el.appendChild(b);
+  });
+}
+
+function renderDayTabs(){
+  const el = document.getElementById('dayTabs');
+  el.innerHTML = '';
+  DAYS.forEach((d,i)=>{
+    const rest = isRest(state.phase, i);
+    const b = document.createElement('button');
+    b.className = 'day-btn' + (rest?' rest':'') + (state.day===i?' active':'');
+    b.textContent = d;
+    b.onclick = ()=>{ state.day = i; render(); };
+    el.appendChild(b);
+  });
+}
+
+function getChecks(){
+  try{
+    const raw = localStorage.getItem('ekn-gym-checks');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function setChecks(data){
+  try{ localStorage.setItem('ekn-gym-checks', JSON.stringify(data)); }catch(e){}
+}
+function checkKey(){
+  return state.profile + '|' + state.phase + '|' + state.day;
+}
+function toggleExercise(idx){
+  const all = getChecks();
+  const key = checkKey();
+  const set = new Set(all[key] || []);
+  if(set.has(idx)) set.delete(idx); else set.add(idx);
+  all[key] = Array.from(set);
+  setChecks(all);
+  renderContent();
+}
+
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#0A1F13" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+function renderContent(){
+  const el = document.getElementById('content');
+  const phase = PLANS_BY_PROFILE[state.profile][state.phase];
+  const rest = isRest(state.phase, state.day);
+
+  if(rest){
+    el.innerHTML = `
+      <div class="card rest-card">
+        <p class="card-title">Descanso</p>
+        <p class="card-tag">${DAYS[state.day]} — recuperación activa</p>
+        <p class="note">El músculo se repara en el descanso, no en el ejercicio. Aprovecha para hidratarte y cuidar la alimentación.</p>
+      </div>`;
+    return;
+  }
+
+  const d = phase.days[state.day];
+  const done = new Set(getChecks()[checkKey()] || []);
+  const doneCount = d.items.reduce((n,_,i)=> n + (done.has(i)?1:0), 0);
+  const total = d.items.length;
+  const pct = total ? Math.round((doneCount/total)*100) : 0;
+
+  let rows = d.items.map((it,i)=>{
+    const isDone = done.has(i);
+    return `
+    <tr class="ex-row${isDone?' done':''}" onclick="toggleExercise(${i})">
+      <td>
+        <div class="ex-cell">
+          <div class="check${isDone?' done':''}">${CHECK_SVG}</div>
+          <div>
+            <div class="ex-name">${it[0]}</div>
+            ${it[2]!=='—' ? `<div class="ex-equip">${it[2]}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      <td class="num">${it[1]}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="card">
+      <p class="card-title">${d.title}</p>
+      <p class="card-tag">${d.tag} · ${phase.label}</p>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-label">${doneCount}/${total} completados</div>
+      </div>
+      <table>
+        <thead><tr><th>Ejercicio (toca para marcar)</th><th>Series x reps</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p class="note"><b>Descanso entre series:</b> ${phase.rest}</p>
+      <div class="done-banner${doneCount===total?' show':''}">🔥 Rutina completa. Así se construyen los resultados, día tras día.</div>
+    </div>`;
+}
+
+function render(){
+  renderProfileSelect();
+  renderPhaseSelect();
+  renderDayTabs();
+  renderContent();
+  document.getElementById('footerNote').innerHTML =
+    '<b>' + (state.profile==='elkin' ? 'Antes de entrenar:' : 'Antes de entrenar:') + '</b> ' +
+    FOOTERS[state.profile].replace('Antes de entrenar: ','');
+}
+
+function enterApp(){
+  const landing = document.getElementById('landing');
+  landing.style.transition = 'opacity .35s ease';
+  landing.style.opacity = '0';
+  setTimeout(()=>{ landing.style.display='none'; }, 350);
+  document.body.style.overflow = 'auto';
+}
+
+document.body.style.overflow = 'hidden';
+render();
+</script>
+</body>
+</html>
